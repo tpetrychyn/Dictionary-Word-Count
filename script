@@ -1,0 +1,154 @@
+Script started on Wed Feb 04 09:30:27 2015
+ 
+news: OpenSSH
+ 
+Script on hercules[1]% g++ main.cpp dictionary.cpp -o main
+Script on hercules[2]% cat main.cpp
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <ctype.h>
+
+#include "dictionary.h"
+
+using namespace std;
+
+int main() {
+        ifstream inData;
+        inData.open("textFile.txt");
+        if (!inData.is_open()) {
+                cout << "Indata not found. Terminating." << endl;
+                return 0;
+        }
+        dictionary dict;
+        word word;
+        
+        dict.ResetP();
+        dict.Iterate();
+
+        while (inData >> word.letters) {
+                int found = word.letters.find_first_not_of("ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz");
+                if (found == std::string::npos)
+                {
+                        dict.InsertSorted(word.letters.substr(0, found));
+                        dict.Iterate();
+                }
+        }
+        inData.close();
+
+        //First print, sorted with duplicates
+        dict.ResetP();
+        dict.Iterate();
+        while (dict.IsPSet()) {
+                cout << "(" << dict.Read().letters << "," << dict.Read().count << ") ";
+                dict.Iterate();
+        }
+        cout << endl << endl << endl;
+
+        //Remove duplicates
+        dict.ResetP();
+        dict.Iterate();
+        while (dict.IsPSet()) {
+                while (dict.Read().count > 1) {
+                        dict.DeleteSorted();
+                }
+                dict.Iterate();
+        }
+
+        //Second print, sorted no duplicates
+        dict.ResetP();
+        dict.Iterate();
+        while (dict.IsPSet()) {
+                cout << "(" << dict.Read().letters << "," << dict.Read().count << ") ";
+                dict.Iterate();
+        }
+        cout << endl;
+
+        return 0;
+}
+Script on hercules[3]% cat dictionary.cpp
+#include "dictionary.h"
+#include <stdlib.h>
+#include <locale>
+
+dictionary::dictionary() {
+        wordList = new word[1000];
+        p = -1;
+        length = 0;
+}
+
+dictionary::~dictionary() {
+        delete[] wordList; //Clean up our wordList array
+}
+
+void dictionary::Iterate() {
+        p++;
+        return;
+}
+
+void dictionary::ResetP() {
+        p = -1;
+        return;
+}
+
+word dictionary::Read() {
+        return wordList[p];
+}
+
+void dictionary::DeleteSorted() {
+        if (!IsPSet())
+                return;
+
+        int q = p;
+        p++;
+        while (p < length) {
+                wordList[p - 1] = wordList[p];
+                p++;
+        }
+        length--;
+        p = q;
+        return;
+}
+
+void dictionary::InsertSorted(string wordToAdd) {
+        //catch duplicates
+        p = 0;
+        while (p < length) {
+                if (wordToAdd == wordList[p].letters){
+                        wordList[p].count++;
+                        return;
+                }
+                p++;
+        }
+
+        p = 0;
+        while (p < length && wordToAdd > wordList[p].letters) 
+                p++;
+        int q = length;
+        while (q > p) {
+                wordList[q].letters = wordList[q - 1].letters;
+                q--;
+        }
+        wordList[p].letters = wordToAdd;
+        length++;
+        return;
+}
+
+bool dictionary::IsPSet() {
+        if (p < 0 || p > length - 1)
+                return false;
+        return true;
+}
+
+word::word() {
+        letters = "";
+        count = 1;
+}Script on hercules[4]% ./main
+(A,2) (AM,1) (Algorithms,1) (Assignment,3) (Both,1) (Break,2) (Close,3) (Courses,7) (Date,4) (Do,7) (Due,5) (Else,15) (For,7) (If,7) (In,4) (January,5) (Magic,4) (Open,5) (Read,4) (Report,4) (The,8) (UR,5) (When,7) (While,6) (Winter,5) (Your,12) (a,6) (actually,8) (algorithms,7) (all,5) (an,12) (and,5) (any,6) (are,4) (as,4) (at,8) (be,5) (beginning,2) (brute,2) (buffer,7) (buffers,3) (by,4) (can,3) (card,4) (character,6) (characters,1) (class,5) (code,2) (compilation,2) (considered,2) (consist,5) (contain,6) (contains,5) (declared,6) (defined,9) (demonstrate,5) (directory,9) (does,3) (each,3) (either,10) (else,2) (end,6) (ending,5) (execution,2) (file,9) (files,3) (first,8) (followed,5) (following,10) (for,3) (force,2) (found,2) (from,2) (general,4) (given,3) (i,4) (if,10) (implementation,2) (implementing,2) (in,3) (indicates,2) (input,5) (into,1) (is,3) (j,3) (k,1) (length,4) (line,1) (list,1) (literal,2) (m,1) (magic,1) (many,1) (match,1) (matching,1) (more,2) (n,2) (named,1) (names,4) (next,2) (not,3) (numbers,2) (of,2) (on,2) (one,2) (or,2) (partners,2) (pattern,2) (patternFile,2) (position,3) (program,2) (provides,1) (ready,3) (required,4) (script,1) (searches,4) (sequence,3) (should,2) (showing,2) (simply,4) (single,1) (source,2) (string,5) (student,2) (submit,1) (text,3) (textFile,2) (that,2) (the,3) (this,1) (time,1) (to,1) (type,1) (unsorted,1) (use,3) (variables,2) (waste,1) (web,2) (where,2) (wild,3) (wildcard,2) (with,1) (working,1) (write,1) (you,1) (your,1) (zipped,1) 
+
+
+(AM,1) (Algorithms,1) (Both,1) (characters,1) (into,1) (k,1) (line,1) (list,1) (m,1) (magic,1) (many,1) (match,1) (matching,1) (named,1) (provides,1) (script,1) (single,1) (submit,1) (this,1) (time,1) (to,1) (type,1) (unsorted,1) (waste,1) (with,1) (working,1) (write,1) (you,1) (your,1) (zipped,1) 
+Script on hercules[5]% exit
+exit
+
+script done on Wed Feb 04 09:31:16 2015

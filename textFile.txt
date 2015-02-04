@@ -1,0 +1,87 @@
+CS210-001: Assignment 4
+Winter 2015 (201510)
+
+Due Date and Time: Friday, January 30, 2015 at 10:20 AM
+
+(100 marks) In this problem, you are required to write a program that searches for a pattern
+of characters in a text file. A pattern is either a literal
+string or else a string that contains magic characters. A literal string is simply a sequence of characters
+that does not
+contain any magic characters. For example,
+the pattern “CS115 is a prerequisite” is a literal
+string. Magic characters consist of the characters ‘*’ and ‘?’. For example,
+the pattern “CS* is a
+pre?equisite” is not a literal string. The ‘*’character is a wildcard character for
+matching many characters and indicates that any sequence of characters
+in the text file beginning with the characters “CS”, followed by one or more characters, and ending
+with the ‘ ’ character, is considered a match for the
+pattern “CS* ”.
+Thus, all of “CS210 ”, “CSSSS ”, “CS  ”, and “CS#q$U@m ” match the pattern.
+The ‘?’ character is a wild card character for matching a single character and indicates that any
+sequence of characters in the text
+file beginning with the characters “CS* is a pre” followed by any single
+character is considered a match for the pattern “CS* is a pre?”. Thus, all of “CS* is a 
+prer”, “CS* is a pre8”, and “CS* is a preZ”, and “CS* is a pre&” match the pattern.
+
+Your program should use the following general algorithm:
+
+Open the pattern file
+Read the first line of the pattern file into the pattern buffer
+While not at the end of the pattern file
+    Open the text file
+    Read the first line of the text file into the text buffer
+    While not at the end of the text file
+        Report each position in the text buffer where a pattern buffer match can be found
+        Read the next line of the text file into the text buffer
+    Close the text file
+    Read the next line of the pattern file into the pattern buffer
+Close the pattern file
+
+The following is a brute force pattern matching algorithm:
+
+m = the length of the pattern buffer
+n = the length of the text buffer
+For i = 0 to n – m
+    j = 0
+    While j < m
+        If pattern buffer [j] == ‘*’
+            k = i + j
+            j ++
+            If j < m
+                While k < n
+                    If text buffer [k] == pattern buffer [j]
+                        j ++
+                        Break
+                    Else
+                        k ++
+                If k == n
+                    Break
+        Else if pattern buffer [j] == ‘?’
+            j ++
+        Else if text buffer [i + j] == pattern buffer [j]
+            j ++
+    If j == m
+        Report i	// match found at position i in text buffer
+
+The pattern and text buffers should be
+declared as variables of an unsorted array-based list type defined
+as a C++ class. Your C++ class should be an implementation of the unsorted array-based
+list algorithms given on the CS210 Algorithms web page.
+
+Do not waste your time implementing any unsorted array-based list algorithms that you don’t actually need.
+
+When you are ready to demonstrate that your program works, use the files
+textFile and patternFile from
+the directory /home/venus/hilder/cs210/assignment4/datafiles as input to your program.
+
+If you are working alone,
+submit the following to UR Courses zipped into a single file:
+(1) the source code for all your .cpp and .h files and
+(2) a script file showing the compilation and execution of your program.
+
+If you are working with a partner,
+one of the partners should submit the following to UR Courses zipped into a single file:
+(1) the source code for all your .cpp and .h files and
+(2) a script file showing the compilation and execution of your program.
+Both partners should submit to UR Courses:
+(1) a file named partners that provides the names and student numbers of the partners.
